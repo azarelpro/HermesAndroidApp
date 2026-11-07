@@ -187,7 +187,11 @@ fun LoginForm(
                     label = { Text(stringResource(R.string.local_ip_hint)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = { /* focus next field */ }),
                     enabled = !isLoading
                 )
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(16.dp))
