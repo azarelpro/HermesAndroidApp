@@ -1,0 +1,81 @@
+# Gradle
+.gradle
+build/
+/*/build/
+/*/*/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Local configuration
+local.properties
+*.local.properties
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+*.ipr
+*.iml
+*.iws
+out/
+
+# Android
+*.aab
+*.so
+*.dex
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+# Generated files
+*.generated.*
+*.generated
+apt_generated/
+annotationProcessor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keystore
+*.keystore
+*.jks
+
+# Crashlytics
+crashlytics-build.properties
+
+# Kotlin
+*.kt.metadata
+
+# Room
+*.db
+*.db-journal
+*.db-wal
+
+# KSP
+ksp/
+
+# Build outputs
+app/build/
+*.apk
+*.aab
+
+# Gradle wrapper
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Caches
+.cache/
+.caches/
+*.log
+
+# Android Studio
+.cxx/
+.externalNativeBuild/
+
+# Test reports
+test-results/
