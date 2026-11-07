@@ -20,7 +20,9 @@ class HermesHttpClient(
     suspend fun login(baseUrl: String, username: String, password: String): Result<AuthLoginResponse> = withContext(Dispatchers.IO) {
         try {
             val loginUrl = "$baseUrl/auth/password-login"
-            val requestBody = json.encodeToString(AuthLoginRequest(username = username, password = password))
+            val requestBody = json.encodeToString(
+                AuthLoginRequest(provider = "basic", username = username, password = password)
+            )
             val request = Request.Builder()
                 .url(loginUrl)
                 .post(requestBody.toRequestBody("application/json".toMediaType()))
