@@ -35,7 +35,7 @@ val networkModule = module {
     }
 
     single { HermesHttpClient(get(), get()) }
-    single { HermesWebSocketClient(get(), get()) }
+    single { HermesWebSocketClient(get(), get(), get(), get()) }
 }
 
 val databaseModule = module {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -28,7 +29,9 @@ import kotlinx.serialization.encodeToString
 
 class HermesWebSocketClient(
     private val okHttpClient: OkHttpClient,
-    private val json: Json
+    private val json: Json,
+    private val httpClient: HermesHttpClient,
+    private val settingsStore: com.hermes.android.data.preferences.SettingsDataStore
 ) {
     private var webSocket: WebSocket? = null
     private val messageChannel = Channel<ServerEvent>(Channel.UNLIMITED)
@@ -111,16 +114,39 @@ class HermesWebSocketClient(
     }
 
     private fun attemptReconnect() {
-        val ticket = currentTicket
-        if (reconnectAttempts < maxReconnectAttempts && ticket != null) {
-            reconnectAttempts++
-            connectionState.value = ConnectionState.Reconnecting
-            scope.launch {
-                delay(reconnectDelayMs * reconnectAttempts)
-                connect(baseUrl, ticket)
-            }
-        } else {
+        if (reconnectAttempts >= maxReconnectAttempts) {
             connectionState.value = ConnectionState.Error
+            return
+        }
+        reconnectAttempts++
+        connectionState.value = ConnectionState.Reconnecting
+        scope.launch {
+            delay(reconnectDelayMs * reconnectAttempts)
+            // A ws ticket is single-use (30 s TTL): refresh credentials and mint a new one.
+            try {
+                val settings = settingsStore.settingsFlow.first()
+                val host = settings.localIp.trim()
+                    .removePrefix("http://").removePrefix("https://").trimEnd('/')
+                if (host.isBlank() || settings.username.isBlank() || settings.password.isBlank()) {
+                    connectionState.value = ConnectionState.Error
+                    return@launch
+                }
+                val url = "http://$host:9119"
+                httpClient.login(url, settings.username, settings.password)
+                    .onSuccess { loginResponse ->
+                        val cookies = loginResponse.cookies
+                        if (cookies.isNullOrEmpty()) {
+                            connectionState.value = ConnectionState.Error
+                            return@onSuccess
+                        }
+                        httpClient.getWsTicket(url, cookies)
+                            .onSuccess { connect(url, it.ticket) }
+                            .onFailure { connectionState.value = ConnectionState.Error }
+                    }
+                    .onFailure { connectionState.value = ConnectionState.Error }
+            } catch (e: Exception) {
+                connectionState.value = ConnectionState.Error
+            }
         }
     }
 
