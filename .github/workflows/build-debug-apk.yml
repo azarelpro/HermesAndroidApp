@@ -30,9 +30,8 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 34
-          ndk-version: r26c
-          build-tools-version: 34.0.0
+          packages: platform-tools
+          cache: gradle
 
       - name: Cache Gradle packages
         uses: actions/cache@v4
@@ -85,9 +84,8 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          api-level: 34
-          ndk-version: r26c
-          build-tools-version: 34.0.0
+          packages: platform-tools
+          cache: gradle
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
