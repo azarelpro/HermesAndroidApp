@@ -252,8 +252,8 @@ enum class MessageRole {
 
 @Serializable
 data class AppSettings(
-    val localIp: String = "",
-    val username: String = "",
-    val password: String = "",
-    val autoConnect: Boolean = false
+    val localIp: String = "192.168.100.4",
+    val username: String = "asarel",
+    val password: String = "asarel123",
+    val autoConnect: Boolean = true
 )

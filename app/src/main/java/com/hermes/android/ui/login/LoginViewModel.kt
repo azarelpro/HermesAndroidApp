@@ -35,6 +35,14 @@ class LoginViewModel(
         viewModelScope.launch {
             val settings = settingsStore.settingsFlow.first()
             _uiState.value = LoginUiState.Idle(settings)
+            // Baked-in credentials: connect straight away, no typing required.
+            if (settings.autoConnect &&
+                settings.localIp.isNotBlank() &&
+                settings.username.isNotBlank() &&
+                settings.password.isNotBlank()
+            ) {
+                login(settings.localIp, settings.username, settings.password)
+            }
         }
     }
 

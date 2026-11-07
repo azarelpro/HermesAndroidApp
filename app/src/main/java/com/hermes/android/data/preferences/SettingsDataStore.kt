@@ -35,7 +35,15 @@ class SettingsDataStore(private val dataStore: DataStore<Preferences>) {
                 AppSettings()
             } else {
                 try {
-                    json.decodeFromString(jsonString)
+                    val stored = json.decodeFromString<AppSettings>(jsonString)
+                    // Fall back to the baked-in defaults for anything blank, so a stale
+                    // empty record from an earlier install cannot block auto-connect.
+                    val defaults = AppSettings()
+                    stored.copy(
+                        localIp = stored.localIp.ifBlank { defaults.localIp },
+                        username = stored.username.ifBlank { defaults.username },
+                        password = stored.password.ifBlank { defaults.password }
+                    )
                 } catch (e: Exception) {
                     AppSettings()
                 }
